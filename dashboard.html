@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MF TRADING SPA - Dashboard Tributario</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* =========================================
+           VARIABLES Y CONFIGURACIÓN BASE
+           ========================================= */
+      :root {
+        --sidebar-bg: #1e293b;
+        --main-bg: #f1f5f9;
+        --card-bg: #ffffff;
+        --accent-pink: #ec4899;
+        --accent-teal: #14b8a6;
+        --accent-blue: #3b82f6;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Urbanist', sans-serif;
+      }
+
+      body {
+        background-color: var(--main-bg);
+        color: var(--text-dark);
+        min-height: 100vh;
+      }
+
+      /* =========================================
+           SISTEMA DE PESTAÑAS CSS (SIN JS)
+           ========================================= */
+      input[type='radio'] {
+        display: none;
+      }
+
+      .app-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .panel {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Lógica para mostrar paneles (Corregida) */
+      #tab-dashboard:checked ~ .app-container .main-content #panel-dashboard {
+        display: block;
+      }
+      #tab-detalle:checked ~ .app-container .main-content #panel-detalle {
+        display: block;
+      }
+
+      /* Lógica para iluminar botones del sidebar (Corregida) */
+      #tab-dashboard:checked
+        ~ .app-container
+        .sidebar
+        label[for='tab-dashboard'],
+      #tab-detalle:checked ~ .app-container .sidebar label[for='tab-detalle'] {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border-left-color: var(--accent-teal);
+      }
+
+      /* =========================================
+           SIDEBAR (BARRA LATERAL)
+           ========================================= */
+      .sidebar {
+        width: 260px;
+        background-color: var(--sidebar-bg);
+        color: #94a3b8;
+        padding: 30px 0;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+      }
+
+      .logo {
+        padding: 0 30px 30px;
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo span {
+        color: var(--accent-teal);
+      }
+
+      .nav-item {
+        padding: 16px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        border-left: 4px solid transparent;
+        transition: var(--transition);
+      }
+
+      .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.04);
+        color: white;
+      }
+
+      .nav-item i {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+      }
+
+      /* =========================================
+           CONTENIDO PRINCIPAL
+           ========================================= */
+      .main-content {
+        flex: 1;
+        margin-left: 260px;
+        padding: 40px;
+        max-width: 1400px;
+      }
+
+      .header {
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        color: var(--text-muted);
+        font-size: 16px;
+      }
+
+      /* =========================================
+           GRILLA Y TARJETAS (CARDS)
+           ========================================= */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+      }
+
+      .kpi-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .kpi-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+
+      .icon-teal {
+        background: rgba(20, 184, 166, 0.1);
+        color: var(--accent-teal);
+      }
+      .icon-pink {
+        background: rgba(236, 72, 153, 0.1);
+        color: var(--accent-pink);
+      }
+      .icon-blue {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+      }
+
+      .kpi-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      .kpi-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      /* =========================================
+           SECCIÓN DESTACADA (HIGHLIGHT)
+           ========================================= */
+      .highlight-card {
+        background: linear-gradient(135deg, var(--sidebar-bg) 0%, #0f172a 100%);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+
+      .highlight-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(236, 72, 153, 0.15) 0%,
+          rgba(20, 184, 166, 0.05) 50%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .highlight-info {
+        flex: 1;
+        min-width: 300px;
+        z-index: 1;
+      }
+
+      .highlight-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--accent-teal);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      .highlight-total {
+        font-size: 56px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        line-height: 1.1;
+      }
+
+      .highlight-desc {
+        color: #94a3b8;
+        font-size: 16px;
+      }
+
+      /* =========================================
+           GRÁFICO DE BARRAS (PURO CSS)
+           ========================================= */
+      .bar-chart-wrapper {
+        height: 350px;
+        display: flex;
+        align-items: flex-end;
+        gap: 2%;
+        padding-bottom: 30px;
+        padding-top: 30px;
+        position: relative;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .y-axis {
+        position: absolute;
+        left: 0;
+        top: 30px;
+        height: calc(100% - 60px);
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .y-line {
+        width: 100%;
+        border-bottom: 1px dashed var(--border-color);
+        position: relative;
+      }
+
+      .bar-group {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        z-index: 1;
+        position: relative;
+      }
+
+      .bars-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .bar {
+        width: 32px;
+        border-radius: 4px 4px 0 0;
+        transition: var(--transition);
+        position: relative;
+      }
+
+      .bar-value {
+        position: absolute;
+        top: -22px;
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-dark);
+        left: 0;
+      }
+
+      .bar.yr-25 .bar-value {
+        color: var(--accent-blue);
+      }
+      .bar.yr-26 .bar-value {
+        color: var(--accent-teal);
+      }
+
+      .bar:hover {
+        opacity: 0.8;
+        transform: scaleY(1.02);
+        transform-origin: bottom;
+      }
+
+      .bar.yr-25 {
+        background-color: var(--accent-blue);
+      }
+      .bar.yr-26 {
+        background-color: var(--accent-teal);
+      }
+
+      .x-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        position: absolute;
+        bottom: -25px;
+      }
+
+      .chart-legend {
+        display: flex;
+        gap: 15px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+      }
+
+      /* =========================================
+           GRÁFICO DE DONUT (PURO CSS)
+           ========================================= */
+      .doughnut-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        z-index: 1;
+        flex-wrap: wrap;
+      }
+
+      .doughnut-chart {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--accent-pink) 0% 96.7%,
+          var(--accent-teal) 96.7% 98.8%,
+          var(--accent-blue) 98.8% 100%
+        );
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .doughnut-inner {
+        width: 110px;
+        height: 110px;
+        background-color: var(--sidebar-bg); /* Modificado para fondo oscuro */
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .doughnut-inner span {
+        font-size: 11px;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+      }
+
+      .doughnut-inner strong {
+        font-size: 18px;
+        color: white;
+        margin-top: 2px;
+      }
+
+      .doughnut-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 150px;
+      }
+
+      .d-legend-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: white;
+      }
+
+      .d-legend-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .d-legend-item .text-muted {
+        color: #94a3b8;
+      }
+
+      /* =========================================
+           TABLA DE DETALLE
+           ========================================= */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        padding: 16px 20px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      th {
+        background-color: #f8fafc;
+        color: var(--text-muted);
+        font-family: 'Urbanist', sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      tr:hover td {
+        background-color: #f8fafc;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+      .text-neg {
+        color: #ef4444;
+      }
+      .row-total td {
+        font-weight: 700;
+        background-color: #f8fafc;
+      }
+      .row-highlight td {
+        color: var(--accent-pink);
+        font-weight: 700;
+      }
+      .row-final td {
+        background-color: var(--sidebar-bg);
+        color: white;
+        border-bottom: none;
+      }
+      .row-final:hover td {
+        background-color: var(--sidebar-bg);
+      }
+
+      /* =========================================
+           RESPONSIVIDAD (MEDIA QUERIES)
+           ========================================= */
+      @media (max-width: 1024px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .app-container {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+          flex-direction: row;
+          padding: 15px 20px;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .logo {
+          border: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .nav-item {
+          padding: 10px 15px;
+          border-left: none;
+          border-bottom: 3px solid transparent;
+        }
+
+        #tab-dashboard:checked
+          ~ .app-container
+          .sidebar
+          label[for='tab-dashboard'],
+        #tab-detalle:checked
+          ~ .app-container
+          .sidebar
+          label[for='tab-detalle'] {
+          border-left-color: transparent;
+          border-bottom-color: var(--accent-teal);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+
+        .bar {
+          width: 20px;
+        }
+
+        .bar-value {
+          font-size: 10px;
+        }
+
+        .bar-chart-wrapper {
+          height: 250px;
+          overflow-x: auto;
+          padding-bottom: 40px;
+        }
+
+        .bar-group {
+          min-width: 50px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- CONTROLADORES DE ESTADO (PESTAÑAS CSS) -->
+    <input type="radio" name="tabs" id="tab-dashboard" checked />
+    <input type="radio" name="tabs" id="tab-detalle" />
+
+    <div class="app-container">
+      <!-- BARRA LATERAL -->
+      <aside class="sidebar">
+        <div class="logo">
+          <i class="fa-solid fa-chart-pie"></i> MF <span>TRADING</span>
+        </div>
+        <label for="tab-dashboard" class="nav-item">
+          <i class="fa-solid fa-border-all"></i>
+          <span class="nav-text">Dashboard</span>
+        </label>
+        <label for="tab-detalle" class="nav-item">
+          <i class="fa-solid fa-table-list"></i>
+          <span class="nav-text">Detalle</span>
+        </label>
+      </aside>
+
+      <!-- CONTENIDO PRINCIPAL -->
+      <main class="main-content">
+        <!-- PANEL 1: DASHBOARD -->
+        <div id="panel-dashboard" class="panel">
+          <div class="header">
+            <h1>Resumen Financiero y Tributario</h1>
+            <p>Periodo Comercial 2026</p>
+          </div>
+
+          <!-- DESTACADO: IMPUESTOS MARZO 2026 -->
+          <div class="card highlight-card">
+            <div class="highlight-info">
+              <div class="highlight-label">
+                <i class="fa-solid fa-triangle-exclamation"></i> Prioridad de
+                Pago - Marzo 2026
+              </div>
+              <div class="highlight-total">$16.114.364</div>
+              <div class="highlight-desc">
+                Total de impuestos a declarar y pagar correspondiente al
+                periodo.
+              </div>
+            </div>
+
+            <div class="doughnut-container">
+              <div class="doughnut-chart">
+                <div class="doughnut-inner">
+                  <span>MIX IMPUESTOS</span>
+                  <strong>MARZO</strong>
+                </div>
+              </div>
+              <div class="doughnut-legend">
+                <div class="d-legend-item">
+                  <div class="d-legend-left">
+                    <div
+                      class="legend-color"
+                      style="background: var(--accent-pink)"
+                    ></div>
+                    <span>IVA</span>
+                  </div>
+                  <span class="text-muted">96.7%</span>
+                </div>
+                <div class="d-legend-item">
+                  <div class="d-legend-left">
+                    <div
+                      class="legend-color"
+                      style="background: var(--accent-teal)"
+                    ></div>
+                    <span>PPM</span>
+                  </div>
+                  <span class="text-muted">2.1%</span>
+                </div>
+                <div class="d-legend-item">
+                  <div class="d-legend-left">
+                    <div
+                      class="legend-color"
+                      style="background: var(--accent-blue)"
+                    ></div>
+                    <span>Retenciones</span>
+                  </div>
+                  <span class="text-muted">1.2%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPIs ACUMULADOS -->
+          <div class="kpi-grid">
+            <div class="card kpi-card">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                "
+              >
+                <div>
+                  <div class="kpi-icon icon-teal">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                  </div>
+                  <div class="kpi-title">Ingresos Acumulados Q1 2026</div>
+                  <div class="kpi-value">$250.596.558</div>
+                </div>
+                <div
+                  style="
+                    text-align: right;
+                    background: #fff1f2;
+                    color: #e11d48;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    font-weight: 700;
+                    font-size: 14px;
+                    box-shadow: 0 2px 4px rgba(225, 29, 72, 0.1);
+                  "
+                >
+                  <i class="fa-solid fa-arrow-trend-down"></i> -17.06%
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 15px;
+                  padding-top: 15px;
+                  border-top: 1px dashed var(--border-color);
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 14px;
+                "
+              >
+                <span style="color: var(--text-muted); font-weight: 600"
+                  >Comparativa Q1 2025:</span
+                >
+                <span style="font-weight: 700; color: var(--text-dark)"
+                  >$302.124.215</span
+                >
+              </div>
+            </div>
+
+            <div class="card kpi-card" style="justify-content: center">
+              <div class="kpi-icon icon-pink">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+              </div>
+              <div class="kpi-title">IVA Acumulado 2026</div>
+              <div class="kpi-value">$17.626.763</div>
+            </div>
+          </div>
+
+          <!-- GRÁFICO COMPARATIVO FULL WIDTH -->
+          <div class="card" style="margin-bottom: 30px">
+            <div class="card-header">
+              <h2 class="card-title">
+                Comparativa Ingresos Mensuales (en Millones CLP)
+              </h2>
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <div
+                    class="legend-color"
+                    style="background: var(--accent-blue)"
+                  ></div>
+                  2025
+                </div>
+                <div class="legend-item">
+                  <div
+                    class="legend-color"
+                    style="background: var(--accent-teal)"
+                  ></div>
+                  2026
+                </div>
+              </div>
+            </div>
+            <div class="bar-chart-wrapper">
+              <div class="y-axis">
+                <div class="y-line"></div>
+                <div class="y-line"></div>
+                <div class="y-line"></div>
+                <div class="y-line"></div>
+              </div>
+
+              <!-- ENE -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 74%">
+                    <span class="bar-value">119</span>
+                  </div>
+                  <div class="bar yr-26" style="height: 24%">
+                    <span class="bar-value">39</span>
+                  </div>
+                </div>
+                <span class="x-label">ENE</span>
+              </div>
+              <!-- FEB -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 47%">
+                    <span class="bar-value">75</span>
+                  </div>
+                  <div class="bar yr-26" style="height: 49%">
+                    <span class="bar-value">79</span>
+                  </div>
+                </div>
+                <span class="x-label">FEB</span>
+              </div>
+              <!-- MAR -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 68%">
+                    <span class="bar-value">109</span>
+                  </div>
+                  <div class="bar yr-26" style="height: 83%">
+                    <span class="bar-value">133</span>
+                  </div>
+                </div>
+                <span class="x-label">MAR</span>
+              </div>
+              <!-- ABR -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 99%">
+                    <span class="bar-value">159</span>
+                  </div>
+                </div>
+                <span class="x-label">ABR</span>
+              </div>
+              <!-- MAY -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 64%">
+                    <span class="bar-value">103</span>
+                  </div>
+                </div>
+                <span class="x-label">MAY</span>
+              </div>
+              <!-- JUN -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 58%">
+                    <span class="bar-value">92</span>
+                  </div>
+                </div>
+                <span class="x-label">JUN</span>
+              </div>
+              <!-- JUL -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 69%">
+                    <span class="bar-value">110</span>
+                  </div>
+                </div>
+                <span class="x-label">JUL</span>
+              </div>
+              <!-- AGO -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 70%">
+                    <span class="bar-value">112</span>
+                  </div>
+                </div>
+                <span class="x-label">AGO</span>
+              </div>
+              <!-- SEP -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 63%">
+                    <span class="bar-value">100</span>
+                  </div>
+                </div>
+                <span class="x-label">SEP</span>
+              </div>
+              <!-- OCT -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 99%">
+                    <span class="bar-value">158</span>
+                  </div>
+                </div>
+                <span class="x-label">OCT</span>
+              </div>
+              <!-- NOV -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 39%">
+                    <span class="bar-value">63</span>
+                  </div>
+                </div>
+                <span class="x-label">NOV</span>
+              </div>
+              <!-- DIC -->
+              <div class="bar-group">
+                <div class="bars-container">
+                  <div class="bar yr-25" style="height: 5%">
+                    <span class="bar-value">4</span>
+                  </div>
+                </div>
+                <span class="x-label">DIC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: DETALLE / TABLA -->
+        <div id="panel-detalle" class="panel">
+          <div class="header">
+            <h1>Detalle de Resumen de Impuestos</h1>
+            <p>
+              Cifras expresadas en Pesos Chilenos (CLP) - Año Comercial 2026
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th class="text-right">Enero</th>
+                    <th class="text-right">Febrero</th>
+                    <th class="text-right">Marzo</th>
+                    <th class="text-right">Total Q1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>IVA DÉBITO</td>
+                    <td class="text-right">7.331.292</td>
+                    <td class="text-right">14.917.797</td>
+                    <td class="text-right">25.364.258</td>
+                    <td class="text-right">47.613.347</td>
+                  </tr>
+                  <tr>
+                    <td>IVA CRÉDITO</td>
+                    <td class="text-right text-neg">-4.962.690</td>
+                    <td class="text-right text-neg">-4.329.002</td>
+                    <td class="text-right text-neg">-9.785.155</td>
+                    <td class="text-right text-neg">-19.076.847</td>
+                  </tr>
+                  <tr class="row-total">
+                    <td>IVA DETERMINADO</td>
+                    <td class="text-right">2.368.602</td>
+                    <td class="text-right">10.588.795</td>
+                    <td class="text-right">15.579.103</td>
+                    <td class="text-right">28.536.500</td>
+                  </tr>
+                  <tr class="row-highlight">
+                    <td>IVA A PAGAR</td>
+                    <td class="text-right">0</td>
+                    <td class="text-right">2.047.660</td>
+                    <td class="text-right">15.579.103</td>
+                    <td class="text-right">17.626.763</td>
+                  </tr>
+                  <tr>
+                    <td>PPM</td>
+                    <td class="text-right">96.464</td>
+                    <td class="text-right">196.287</td>
+                    <td class="text-right">333.740</td>
+                    <td class="text-right">626.491</td>
+                  </tr>
+                  <tr>
+                    <td>IMPTO 2DA CAT.</td>
+                    <td class="text-right">145.916</td>
+                    <td class="text-right">145.992</td>
+                    <td class="text-right">145.441</td>
+                    <td class="text-right">437.349</td>
+                  </tr>
+                  <tr>
+                    <td>RETENCIÓN 10%</td>
+                    <td class="text-right">55.929</td>
+                    <td class="text-right">55.944</td>
+                    <td class="text-right">56.080</td>
+                    <td class="text-right">167.953</td>
+                  </tr>
+                  <tr class="row-final">
+                    <td>TOTAL PAGO MES</td>
+                    <td class="text-right">298.309</td>
+                    <td class="text-right">2.445.883</td>
+                    <td class="text-right">16.114.364</td>
+                    <td class="text-right">18.858.556</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
