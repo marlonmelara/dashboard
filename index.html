@@ -449,9 +449,9 @@
         height: 160px;
         border-radius: 50%;
         background: conic-gradient(
-          var(--accent-pink) 0% 96.7%,
-          var(--accent-teal) 96.7% 98.8%,
-          var(--accent-blue) 98.8% 100%
+          var(--accent-pink) 0% 90.6%,
+          var(--accent-teal) 90.6% 93.8%,
+          var(--accent-blue) 93.8% 100%
         );
         position: relative;
         display: flex;
@@ -642,12 +642,287 @@
           min-width: 50px;
         }
       }
+      /* =========================================
+   COMPONENTE: PRINT HEADER (BEM)
+   ========================================= */
+
+      /* 1. Estado inicial: Oculto en todo dispositivo pequeño */
+      .print-header {
+        display: none;
+      }
+
+      /* 2. Solo se activa y posiciona en Escritorio (PC) */
+      @media (min-width: 1024px) {
+        .print-header {
+          display: block; /* Lo hacemos visible */
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 1000;
+        }
+
+        .print-header__button {
+          background-color: var(--accent-teal);
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 10px;
+          font-weight: 700;
+          font-family: 'Urbanist', sans-serif;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.3);
+          transition: var(--transition);
+        }
+
+        .print-header__button:hover {
+          background-color: #0d9488;
+          transform: translateY(-2px);
+        }
+      }
+
+      /* =========================================
+   MEDIA QUERY: PRINT (HORIZONTAL / LANDSCAPE)
+   ========================================= */
+      @media print {
+        @page {
+          size: letter landscape;
+          margin: 0.8cm 1cm;
+        }
+
+        /* Forzar colores de fondo en Chrome/Safari */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        /* 1. Ocultar elementos innecesarios */
+        .sidebar,
+        .print-header,
+        .print-controls,
+        input[type='radio'] {
+          display: none !important;
+        }
+
+        /* 2. Resetear el layout principal */
+        .app-container {
+          display: block;
+        }
+
+        .main-content {
+          margin-left: 0 !important;
+          padding: 0 !important;
+          width: 100%;
+          max-width: 100%;
+        }
+
+        /* 3. Panel Dashboard = Hoja 1 | Panel Detalle = Hoja 2 */
+        .panel {
+          display: block !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+
+        #panel-dashboard {
+          page-break-after: always;
+          break-after: page;
+        }
+
+        #panel-detalle {
+          page-break-before: always;
+          break-before: page;
+        }
+
+        /* 4. Reset body */
+        body {
+          background-color: white;
+          font-size: 10pt;
+        }
+
+        /* 5. Cards base */
+        .card {
+          box-shadow: none !important;
+          border: 1px solid #ddd !important;
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+
+        /* ── HOJA 1: DASHBOARD ─────────────────────── */
+
+        /* Header compacto */
+        .header {
+          margin-bottom: 8px;
+        }
+        .header h1 {
+          font-size: 16pt;
+          margin-bottom: 2px;
+        }
+        .header p {
+          font-size: 9pt;
+        }
+
+        /* highlight-card: fondo blanco, texto negro */
+        .highlight-card {
+          background: #ffffff !important;
+          color: #0f172a !important;
+          border: 1px solid #ddd !important;
+          padding: 12px 16px !important;
+          margin-bottom: 10px !important;
+          gap: 16px !important;
+        }
+
+        .highlight-card::before {
+          display: none !important;
+        }
+
+        .highlight-label {
+          color: #14b8a6 !important;
+          font-size: 9pt !important;
+          margin-bottom: 4px !important;
+        }
+
+        .highlight-total {
+          font-size: 28pt !important;
+          color: #0f172a !important;
+          margin-bottom: 2px !important;
+        }
+
+        .highlight-desc {
+          color: #64748b !important;
+          font-size: 9pt !important;
+        }
+
+        /* doughnut-container: fondo blanco, textos negros */
+        .doughnut-container {
+          gap: 16px !important;
+        }
+
+        .doughnut-chart {
+          width: 110px !important;
+          height: 110px !important;
+          box-shadow: none !important;
+        }
+
+        .doughnut-inner {
+          width: 76px !important;
+          height: 76px !important;
+          background-color: #ffffff !important;
+        }
+
+        .doughnut-inner span {
+          color: #64748b !important;
+          font-size: 8pt !important;
+        }
+
+        .doughnut-inner strong {
+          color: #0f172a !important;
+          font-size: 11pt !important;
+        }
+
+        .d-legend-item {
+          color: #0f172a !important;
+          font-size: 9pt !important;
+        }
+
+        .d-legend-item .text-muted {
+          color: #64748b !important;
+        }
+
+        /* KPI Grid: 2 columnas compactas en la misma fila */
+        .kpi-grid {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: 8px !important;
+          margin-bottom: 10px !important;
+        }
+
+        .kpi-card {
+          padding: 10px 14px !important;
+          gap: 4px !important;
+        }
+
+        .kpi-icon {
+          width: 32px !important;
+          height: 32px !important;
+          font-size: 14px !important;
+          margin-bottom: 2px !important;
+        }
+
+        .kpi-title {
+          font-size: 7pt !important;
+        }
+
+        .kpi-value {
+          font-size: 16pt !important;
+        }
+
+        /* Gráfico comparativo: full width, altura reducida */
+        .charts-grid {
+          display: block !important;
+        }
+
+        .card[style*='margin-bottom'] {
+          margin-bottom: 0 !important;
+        }
+
+        .bar-chart-wrapper {
+          height: 170px !important;
+          padding-bottom: 24px !important;
+          padding-top: 20px !important;
+        }
+
+        .bar-value {
+          font-size: 8pt !important;
+          top: -16px !important;
+        }
+
+        .x-label {
+          font-size: 8pt !important;
+          bottom: -20px !important;
+        }
+
+        .card-title {
+          font-size: 12pt !important;
+        }
+
+        .chart-legend {
+          font-size: 9pt !important;
+        }
+
+        /* ── HOJA 2: TABLA ─────────────────────────── */
+        #panel-detalle .header {
+          margin-bottom: 10px;
+        }
+
+        table {
+          font-size: 9pt !important;
+        }
+
+        th,
+        td {
+          padding: 8px 12px !important;
+        }
+
+        /* row-final mantiene fondo oscuro en impresión */
+        .row-final td {
+          background-color: #1e293b !important;
+          color: #ffffff !important;
+        }
+      }
     </style>
   </head>
   <body>
     <!-- CONTROLADORES DE ESTADO (PESTAÑAS CSS) -->
     <input type="radio" name="tabs" id="tab-dashboard" checked />
     <input type="radio" name="tabs" id="tab-detalle" />
+
+    <div class="print-header">
+      <button class="print-header__button" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Imprimir Reporte
+      </button>
+    </div>
 
     <div class="app-container">
       <!-- BARRA LATERAL -->
@@ -670,8 +945,8 @@
         <!-- PANEL 1: DASHBOARD -->
         <div id="panel-dashboard" class="panel">
           <div class="header">
-            <h1>Resumen Financiero y Tributario</h1>
-            <p>Periodo Comercial 2026</p>
+            <h1>Resumen Impuestos</h1>
+            <p>Periodo Año Comercial 2026 / Año Tributario 2027</p>
           </div>
 
           <!-- DESTACADO: IMPUESTOS MARZO 2026 -->
@@ -679,9 +954,9 @@
             <div class="highlight-info">
               <div class="highlight-label">
                 <i class="fa-solid fa-triangle-exclamation"></i> Prioridad de
-                Pago - Marzo 2026
+                Pago - Abril 2026
               </div>
-              <div class="highlight-total">$16.114.364</div>
+              <div class="highlight-total">$ 5.723.969</div>
               <div class="highlight-desc">
                 Total de impuestos a declarar y pagar correspondiente al
                 periodo.
@@ -692,7 +967,7 @@
               <div class="doughnut-chart">
                 <div class="doughnut-inner">
                   <span>MIX IMPUESTOS</span>
-                  <strong>MARZO</strong>
+                  <strong>ABRIL</strong>
                 </div>
               </div>
               <div class="doughnut-legend">
@@ -704,7 +979,7 @@
                     ></div>
                     <span>IVA</span>
                   </div>
-                  <span class="text-muted">96.7%</span>
+                  <span class="text-muted">90.6%</span>
                 </div>
                 <div class="d-legend-item">
                   <div class="d-legend-left">
@@ -714,7 +989,7 @@
                     ></div>
                     <span>PPM</span>
                   </div>
-                  <span class="text-muted">2.1%</span>
+                  <span class="text-muted">3.2%</span>
                 </div>
                 <div class="d-legend-item">
                   <div class="d-legend-left">
@@ -724,7 +999,7 @@
                     ></div>
                     <span>Retenciones</span>
                   </div>
-                  <span class="text-muted">1.2%</span>
+                  <span class="text-muted">6.2%</span>
                 </div>
               </div>
             </div>
@@ -744,8 +1019,8 @@
                   <div class="kpi-icon icon-teal">
                     <i class="fa-solid fa-sack-dollar"></i>
                   </div>
-                  <div class="kpi-title">Ingresos Acumulados Q1 2026</div>
-                  <div class="kpi-value">$250.596.558</div>
+                  <div class="kpi-title">Ingresos Acumulados Q1 + Q2 2026</div>
+                  <div class="kpi-value">$ 324.511.106</div>
                 </div>
                 <div
                   style="
@@ -759,7 +1034,7 @@
                     box-shadow: 0 2px 4px rgba(225, 29, 72, 0.1);
                   "
                 >
-                  <i class="fa-solid fa-arrow-trend-down"></i> -17.06%
+                  <i class="fa-solid fa-arrow-trend-down"></i> -29.57%
                 </div>
               </div>
               <div
@@ -773,10 +1048,10 @@
                 "
               >
                 <span style="color: var(--text-muted); font-weight: 600"
-                  >Comparativa Q1 2025:</span
+                  >Comparativa Q1 + Q2 2025:</span
                 >
                 <span style="font-weight: 700; color: var(--text-dark)"
-                  >$302.124.215</span
+                  >$460.793.796</span
                 >
               </div>
             </div>
@@ -785,8 +1060,8 @@
               <div class="kpi-icon icon-pink">
                 <i class="fa-solid fa-file-invoice-dollar"></i>
               </div>
-              <div class="kpi-title">IVA Acumulado 2026</div>
-              <div class="kpi-value">$17.626.763</div>
+              <div class="kpi-title">PPM Acumulado 2026</div>
+              <div class="kpi-value">$811.277</div>
             </div>
           </div>
 
@@ -863,6 +1138,9 @@
                   <div class="bar yr-25" style="height: 99%">
                     <span class="bar-value">159</span>
                   </div>
+                  <div class="bar yr-26" style="height: 46%">
+                    <span class="bar-value">74</span>
+                  </div>
                 </div>
                 <span class="x-label">ABR</span>
               </div>
@@ -914,8 +1192,8 @@
               <!-- OCT -->
               <div class="bar-group">
                 <div class="bars-container">
-                  <div class="bar yr-25" style="height: 99%">
-                    <span class="bar-value">158</span>
+                  <div class="bar yr-25" style="height: 69%">
+                    <span class="bar-value">111</span>
                   </div>
                 </div>
                 <span class="x-label">OCT</span>
@@ -932,8 +1210,8 @@
               <!-- DIC -->
               <div class="bar-group">
                 <div class="bars-container">
-                  <div class="bar yr-25" style="height: 5%">
-                    <span class="bar-value">4</span>
+                  <div class="bar yr-25" style="height: 32%">
+                    <span class="bar-value">52</span>
                   </div>
                 </div>
                 <span class="x-label">DIC</span>
@@ -945,9 +1223,10 @@
         <!-- PANEL 2: DETALLE / TABLA -->
         <div id="panel-detalle" class="panel">
           <div class="header">
-            <h1>Detalle de Resumen de Impuestos</h1>
+            <h1>Tabla Resumen de Impuestos</h1>
             <p>
-              Cifras expresadas en Pesos Chilenos (CLP) - Año Comercial 2026
+              Cifras expresadas en Pesos Chilenos (CLP) - Año Comercial 2026 /
+              Año Tributario 2027
             </p>
           </div>
 
@@ -960,7 +1239,8 @@
                     <th class="text-right">Enero</th>
                     <th class="text-right">Febrero</th>
                     <th class="text-right">Marzo</th>
-                    <th class="text-right">Total Q1</th>
+                    <th class="text-right">Abril</th>
+                    <th class="text-right">Total Q1 + Q2</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -969,56 +1249,81 @@
                     <td class="text-right">7.331.292</td>
                     <td class="text-right">14.917.797</td>
                     <td class="text-right">25.364.258</td>
-                    <td class="text-right">47.613.347</td>
+                    <td class="text-right">14.043.765</td>
+                    <td class="text-right">61.657.112</td>
                   </tr>
                   <tr>
                     <td>IVA CRÉDITO</td>
                     <td class="text-right text-neg">-4.962.690</td>
                     <td class="text-right text-neg">-4.329.002</td>
                     <td class="text-right text-neg">-9.785.155</td>
-                    <td class="text-right text-neg">-19.076.847</td>
+                    <td class="text-right text-neg">-8.858.261</td>
+                    <td class="text-right text-neg">-27.935.108</td>
                   </tr>
+
                   <tr class="row-total">
                     <td>IVA DETERMINADO</td>
                     <td class="text-right">2.368.602</td>
                     <td class="text-right">10.588.795</td>
                     <td class="text-right">15.579.103</td>
-                    <td class="text-right">28.536.500</td>
+                    <td class="text-right">5.185.504</td>
+                    <td class="text-right">33.722.004</td>
+                  </tr>
+                  <tr>
+                    <td>REMANENTE IVA ANTERIOR (AJUSTADO)</td>
+                    <td class="text-right text-neg">-10.876.023</td>
+                    <td class="text-right text-neg">-8.541.135</td>
+                    <td class="text-right text-neg">0</td>
+                    <td class="text-right text-neg">0</td>
+                    <td class="text-right text-neg"></td>
+                  </tr>
+                  <tr>
+                    <td>REMANENTE IVA SIGUIENTE</td>
+                    <td class="text-right text-neg">- 8.507.421</td>
+                    <td class="text-right text-neg">0</td>
+                    <td class="text-right text-neg">0</td>
+                    <td class="text-right text-neg">0</td>
+                    <td class="text-right text-neg"></td>
                   </tr>
                   <tr class="row-highlight">
                     <td>IVA A PAGAR</td>
                     <td class="text-right">0</td>
                     <td class="text-right">2.047.660</td>
                     <td class="text-right">15.579.103</td>
-                    <td class="text-right">17.626.763</td>
+                    <td class="text-right">5.185.504</td>
+                    <td class="text-right">22.812.267</td>
                   </tr>
                   <tr>
                     <td>PPM</td>
                     <td class="text-right">96.464</td>
                     <td class="text-right">196.287</td>
                     <td class="text-right">333.740</td>
-                    <td class="text-right">626.491</td>
+                    <td class="text-right">184.786</td>
+                    <td class="text-right">811.277</td>
                   </tr>
                   <tr>
                     <td>IMPTO 2DA CAT.</td>
                     <td class="text-right">145.916</td>
                     <td class="text-right">145.992</td>
                     <td class="text-right">145.441</td>
-                    <td class="text-right">437.349</td>
+                    <td class="text-right">145.077</td>
+                    <td class="text-right">582.426</td>
                   </tr>
                   <tr>
                     <td>RETENCIÓN 10%</td>
                     <td class="text-right">55.929</td>
                     <td class="text-right">55.944</td>
                     <td class="text-right">56.080</td>
-                    <td class="text-right">167.953</td>
+                    <td class="text-right">208.602</td>
+                    <td class="text-right">376.555</td>
                   </tr>
                   <tr class="row-final">
                     <td>TOTAL PAGO MES</td>
                     <td class="text-right">298.309</td>
                     <td class="text-right">2.445.883</td>
                     <td class="text-right">16.114.364</td>
-                    <td class="text-right">18.858.556</td>
+                    <td class="text-right">5.723.969</td>
+                    <td class="text-right">24.582.525</td>
                   </tr>
                 </tbody>
               </table>
